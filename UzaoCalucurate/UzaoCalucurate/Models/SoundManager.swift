@@ -11,18 +11,24 @@ class SoundManager {
     private var players: [String: AVAudioPlayer] = [:]
 
     private init() {
-        prepareSound(named: "click", ext: "mp3")
-        prepareSound(named: "enter", ext: "mp3")
-        prepareSound(named: "clear", ext: "mp3")
+        prepareSound(named: "click")
+        prepareSound(named: "enter")
+        prepareSound(named: "clear")
     }
 
-    private func prepareSound(named name: String, ext: String) {
-        guard let url = Bundle.main.url(forResource: name, withExtension: ext) else { return }
-        do {
-            let player = try AVAudioPlayer(contentsOf: url)
-            player.prepareToPlay()
-            players[name] = player
-        } catch {}
+    /// Try loading mp3 first, then m4a.
+    private func prepareSound(named name: String) {
+        let extensions = ["mp3", "m4a", "wav"]
+        for ext in extensions {
+            if let url = Bundle.main.url(forResource: name, withExtension: ext) {
+                do {
+                    let player = try AVAudioPlayer(contentsOf: url)
+                    player.prepareToPlay()
+                    players[name] = player
+                    return
+                } catch {}
+            }
+        }
     }
 
     /// Play a sound by name. No-ops silently if the file is missing.

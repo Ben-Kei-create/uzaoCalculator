@@ -9,8 +9,8 @@ import SwiftUI
 
 struct CalculatorView: View {
     @StateObject private var brain = UzaoBrain()
-    @State private var showBadges: Bool = false
-    
+    @State private var showSettings: Bool = false
+
     let buttonRows: [[String]] = [
         ["C", "±", "%", "÷"],
         ["7", "8", "9", "×"],
@@ -18,21 +18,21 @@ struct CalculatorView: View {
         ["1", "2", "3", "+"],
         ["0", ".", "="]
     ]
-    
+
     var body: some View {
         ZStack {
             // Background (Desk)
             Color(red: 0.2, green: 0.2, blue: 0.2)
                 .ignoresSafeArea()
-            
+
             VStack(spacing: 0) {
-                // Badge Button (Top Right)
+                // Settings Button (Top Right)
                 HStack {
                     Spacer()
                     Button(action: {
-                        showBadges = true
+                        showSettings = true
                     }) {
-                        Image(systemName: "rosette")
+                        Image(systemName: "gearshape.fill")
                             .font(.system(size: 24))
                             .foregroundColor(Color(red: 0.85, green: 0.83, blue: 0.78))
                             .padding(12)
@@ -46,9 +46,9 @@ struct CalculatorView: View {
                     .padding(.trailing, 20)
                     .padding(.top, 10)
                 }
-                
+
                 Spacer()
-                
+
                 // Calculator Body
                 VStack(spacing: 20) {
                     // LCD Display
@@ -57,11 +57,11 @@ struct CalculatorView: View {
                         displayValue: brain.displayValue
                     )
                     .padding(.top, 20)
-                    
+
                     // Button Grid
                     GeometryReader { geometry in
                         let buttonWidth = (geometry.size.width - 36) / 4 // 3 spacings between 4 buttons
-                        
+
                         VStack(spacing: 12) {
                             ForEach(Array(buttonRows.enumerated()), id: \.offset) { rowIndex, row in
                                 HStack(spacing: 12) {
@@ -101,19 +101,19 @@ struct CalculatorView: View {
                         .shadow(color: Color.black.opacity(0.5), radius: 20, x: 0, y: 10)
                 )
                 .padding(.horizontal, 20)
-                
+
                 Spacer()
-                
+
                 // Ad Space (Bottom)
                 BannerView()
                     .padding(.bottom, 0)
             }
         }
-        .sheet(isPresented: $showBadges) {
-            BadgeListView(badges: brain.badges)
+        .sheet(isPresented: $showSettings) {
+            SettingsView(badges: brain.badges)
         }
     }
-    
+
     private func buttonColor(for label: String) -> Color {
         switch label {
         case "0"..."9", ".":
@@ -132,66 +132,56 @@ struct CalculatorView: View {
 struct BadgeListView: View {
     let badges: [Badge]
     @Environment(\.dismiss) var dismiss
-    
+
     var body: some View {
-        NavigationView {
-            ZStack {
-                Color(red: 0.2, green: 0.2, blue: 0.2)
-                    .ignoresSafeArea()
-                
-                ScrollView {
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
-                        ForEach(badges) { badge in
-                            VStack(spacing: 8) {
-                                ZStack {
-                                    Circle()
-                                        .fill(
-                                            badge.isUnlocked
-                                                ? Color(red: 1.0, green: 0.6, blue: 0.2)
-                                                : Color.gray.opacity(0.3)
-                                        )
-                                        .frame(width: 80, height: 80)
-                                        .shadow(color: Color.white.opacity(0.8), radius: 3, x: -2, y: -2)
-                                        .shadow(color: Color.black.opacity(0.3), radius: 3, x: 3, y: 3)
-                                    
-                                    Image(systemName: badge.isUnlocked ? "checkmark.circle.fill" : "lock.fill")
-                                        .font(.system(size: 40))
-                                        .foregroundColor(badge.isUnlocked ? .white : .gray)
-                                }
-                                
-                                Text(badge.type.displayName)
-                                    .font(.system(size: 14, weight: .medium))
-                                    .foregroundColor(.white)
-                                
-                                if badge.isUnlocked {
-                                    Text(badge.unlockedMessage)
-                                        .font(.system(size: 10))
-                                        .foregroundColor(.gray)
-                                        .multilineTextAlignment(.center)
-                                        .lineLimit(2)
-                                }
+        ZStack {
+            Color(red: 0.2, green: 0.2, blue: 0.2)
+                .ignoresSafeArea()
+
+            ScrollView {
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
+                    ForEach(badges) { badge in
+                        VStack(spacing: 8) {
+                            ZStack {
+                                Circle()
+                                    .fill(
+                                        badge.isUnlocked
+                                            ? Color(red: 1.0, green: 0.6, blue: 0.2)
+                                            : Color.gray.opacity(0.3)
+                                    )
+                                    .frame(width: 80, height: 80)
+                                    .shadow(color: Color.white.opacity(0.8), radius: 3, x: -2, y: -2)
+                                    .shadow(color: Color.black.opacity(0.3), radius: 3, x: 3, y: 3)
+
+                                Image(systemName: badge.isUnlocked ? "checkmark.circle.fill" : "lock.fill")
+                                    .font(.system(size: 40))
+                                    .foregroundColor(badge.isUnlocked ? .white : .gray)
                             }
-                            .padding()
-                            .background(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(Color(red: 0.3, green: 0.3, blue: 0.3).opacity(0.5))
-                            )
+
+                            Text(badge.type.displayName)
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(.white)
+
+                            if badge.isUnlocked {
+                                Text(badge.unlockedMessage)
+                                    .font(.system(size: 10))
+                                    .foregroundColor(.gray)
+                                    .multilineTextAlignment(.center)
+                                    .lineLimit(2)
+                            }
                         }
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color(red: 0.3, green: 0.3, blue: 0.3).opacity(0.5))
+                        )
                     }
-                    .padding()
                 }
-            }
-            .navigationTitle("バッジ一覧")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("閉じる") {
-                        dismiss()
-                    }
-                    .foregroundColor(.white)
-                }
+                .padding()
             }
         }
+        .navigationTitle("バッジ一覧")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
