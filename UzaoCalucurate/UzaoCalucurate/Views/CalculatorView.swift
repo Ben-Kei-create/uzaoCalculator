@@ -72,6 +72,7 @@ struct CalculatorView: View {
                                                 label: button,
                                                 color: buttonColor(for: button)
                                             ) {
+                                                SoundManager.shared.playForKey(button)
                                                 brain.input(key: button)
                                             }
                                             .frame(width: buttonWidth * 2 + 12) // Double width + spacing
@@ -80,6 +81,7 @@ struct CalculatorView: View {
                                                 label: button,
                                                 color: buttonColor(for: button)
                                             ) {
+                                                SoundManager.shared.playForKey(button)
                                                 brain.input(key: button)
                                             }
                                             .frame(width: buttonWidth)
@@ -103,14 +105,7 @@ struct CalculatorView: View {
                 Spacer()
                 
                 // Ad Space (Bottom)
-                Rectangle()
-                    .fill(Color.gray.opacity(0.3))
-                    .frame(height: 50)
-                    .overlay(
-                        Text("広告スペース")
-                            .font(.system(size: 12))
-                            .foregroundColor(.gray)
-                    )
+                BannerView()
                     .padding(.bottom, 0)
             }
         }
