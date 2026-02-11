@@ -6,6 +6,9 @@
 //
 
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#endif
 
 struct NeumorphicButton: View {
     let label: String
@@ -16,6 +19,9 @@ struct NeumorphicButton: View {
     
     var body: some View {
         Button(action: {
+#if canImport(UIKit)
+            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+#endif
             withAnimation(.spring(response: 0.2, dampingFraction: 0.6)) {
                 isPressed = true
             }

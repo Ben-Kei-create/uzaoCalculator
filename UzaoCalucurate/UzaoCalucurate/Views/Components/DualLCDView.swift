@@ -74,16 +74,22 @@ struct DualLCDView: View {
                             .offset(x: 2, y: 2)
                     )
                 
-                HStack {
-                    Spacer()
+                ZStack(alignment: .trailing) {
+                    // LCD Ghosting (残像)
+                    Text("88888888")
+                        .font(.system(size: 56, weight: .light, design: .monospaced))
+                        .foregroundColor(Color.black.opacity(0.05))
+                        .lineLimit(1)
+                    
                     Text(displayValue)
                         .font(.system(size: 56, weight: .light, design: .monospaced))
                         .foregroundColor(Color(red: 0.1, green: 0.2, blue: 0.05))
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 12)
                         .minimumScaleFactor(0.5)
                         .lineLimit(1)
                 }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                .frame(maxWidth: .infinity, alignment: .trailing)
             }
             .frame(height: 80)
         }
