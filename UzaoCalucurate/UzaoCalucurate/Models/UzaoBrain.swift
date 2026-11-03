@@ -49,13 +49,9 @@ class UzaoBrain: ObservableObject {
     
     // MARK: - Input Handling
     func input(key: String) {
-        if shouldResetDisplay {
-            currentInput = "0"
-            shouldResetDisplay = false
-        }
-        
         switch key {
         case "0"..."9":
+            resetInputIfNeeded()
             if currentInput == "0" {
                 currentInput = key
             } else {
@@ -64,13 +60,14 @@ class UzaoBrain: ObservableObject {
             displayValue = currentInput
             
         case ".":
+            resetInputIfNeeded()
             if !currentInput.contains(".") {
                 currentInput += "."
                 displayValue = currentInput
             }
             
         case "+", "-", "×", "÷":
-            if let prevOp = operation {
+            if operation != nil && !shouldResetDisplay {
                 calculate()
             }
             previousValue = Double(currentInput) ?? 0
@@ -100,12 +97,30 @@ class UzaoBrain: ObservableObject {
         }
     }
     
+    /// 計算結果や演算子入力の直後に数字・小数点が押されたら、入力を新しく始める
+    private func resetInputIfNeeded() {
+        if shouldResetDisplay {
+            currentInput = "0"
+            shouldResetDisplay = false
+        }
+    }
+    
     // MARK: - Calculation
     func calculate() {
         guard let op = operation else { return }
         
         let currentValue = Double(currentInput) ?? 0
         var result: Double = 0
+        
+        // 0で割る場合はエラー表示
+        if op == "÷" && currentValue == 0 {
+            displayValue = "エラー"
+            currentInput = "0"
+            uzaoMessage = "0で割る？ 無限の彼方へどうぞ。"
+            operation = nil
+            shouldResetDisplay = true
+            return
+        }
         
         switch op {
         case "+":
@@ -115,7 +130,7 @@ class UzaoBrain: ObservableObject {
         case "×":
             result = previousValue * currentValue
         case "÷":
-            result = currentValue != 0 ? previousValue / currentValue : 0
+            result = previousValue / currentValue
         default:
             return
         }
@@ -230,6 +245,7 @@ class UzaoBrain: ObservableObject {
         previousValue = 0
         operation = nil
         shouldResetDisplay = false
+        clickCount = 0
         uzaoMessage = "計算を始めましょう..."
     }
 }
