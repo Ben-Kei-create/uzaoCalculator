@@ -10,6 +10,7 @@ import SwiftUI
 struct CalculatorView: View {
     @StateObject private var brain = UzaoBrain()
     @State private var showBadges: Bool = false
+    @StateObject private var consent = AdConsentManager()
     
     let buttonRows: [[String]] = [
         ["C", "±", "%", "÷"],
@@ -102,17 +103,19 @@ struct CalculatorView: View {
                 
                 Spacer()
                 
-                // Ad Space (Bottom)
-                Rectangle()
-                    .fill(Color.gray.opacity(0.3))
-                    .frame(height: 50)
-                    .overlay(
-                        Text("広告スペース")
-                            .font(.system(size: 12))
-                            .foregroundColor(.gray)
-                    )
-                    .padding(.bottom, 0)
+                // Ad Space (Bottom) — AdMob banner (320x50)
+                Group {
+                    if consent.canShowAds {
+                        BannerAdView()
+                    } else {
+                        Color.clear
+                    }
+                }
+                .frame(width: 320, height: 50)
             }
+        }
+        .task {
+            await consent.gatherConsentAndStartAds()
         }
         .sheet(isPresented: $showBadges) {
             BadgeListView(badges: brain.badges)
