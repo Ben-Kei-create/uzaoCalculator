@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum BadgeType: String, CaseIterable {
+enum BadgeType: String, CaseIterable, Codable {
     case prime = "prime"
     case soroban = "soroban"
     case physics = "physics"

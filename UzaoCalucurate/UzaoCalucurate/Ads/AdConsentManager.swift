@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Combine
 import GoogleMobileAds
 import UserMessagingPlatform
 import AppTrackingTransparency
@@ -37,7 +38,7 @@ final class AdConsentManager: ObservableObject {
         _ = await ATTrackingManager.requestTrackingAuthorization()
 
         // 3. AdMob SDK 初期化
-        MobileAds.shared.start(completionHandler: nil)
+        await MobileAds.shared.start()
         canShowAds = true
     }
 }
